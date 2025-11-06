@@ -6,7 +6,6 @@ import { useNews } from '../context/NewsContext';
 import { useAuth } from '../context/AuthContext';
 import LoginModal from './LoginModal';
 import MyNewsModal from './MyNewsModal';
-import AddNewsModal from './AddNewsModal';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,11 +13,10 @@ const Header = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMyNewsModal, setShowMyNewsModal] = useState(false);
-  const [showAddNewsModal, setShowAddNewsModal] = useState(false);
   const [hasMyNewsPreferences, setHasMyNewsPreferences] = useState(false);
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
   const { currentLanguage, setLanguage, languages, translations } = useLanguage();
-  const { lastUpdated, articles, refreshNews, personalizedArticles, addNewsArticle } = useNews();
+  const { lastUpdated, articles, refreshNews, personalizedArticles } = useNews();
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -155,16 +153,6 @@ const Header = () => {
                 <Crown className="w-3 h-3" />
                 <span className="text-xs font-bold">Premium</span>
               </Link>
-
-              {isAuthenticated && (
-                <button
-                  onClick={() => setShowAddNewsModal(true)}
-                  className="hidden md:flex items-center space-x-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-3 py-1 transition-all"
-                  title="Add News Article"
-                >
-                  <span className="text-xs font-bold">+ Add News</span>
-                </button>
-              )}
 
               {isAuthenticated && user && (
                 <div className="hidden md:flex items-center space-x-2 bg-white/20 px-3 py-1">
@@ -306,26 +294,14 @@ const Header = () => {
                         <User className="w-4 h-4 mr-3" />
                         Dashboard
                       </Link>
-
+                      
                       <button
-                        onClick={() => {
-                          setShowAddNewsModal(true);
-                          setShowUserMenu(false);
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-sm text-green-600 hover:bg-green-50"
-                      >
-                        <MessageSquare className="w-4 h-4 mr-3" />
-                        Add News
-                      </button>
-
-                      <Link
                         to="/social"
                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                        onClick={() => setShowUserMenu(false)}
                       >
                         <MessageSquare className="w-4 h-4 mr-3" />
                         Social Feed
-                      </Link>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -431,14 +407,6 @@ const Header = () => {
         onSave={handleMyNewsSave}
         initialCategories={[]}
         isFirstTime={isFirstTimeUser}
-      />
-      <AddNewsModal
-        isOpen={showAddNewsModal}
-        onClose={() => setShowAddNewsModal(false)}
-        onSuccess={() => {
-          refreshNews();
-          setShowAddNewsModal(false);
-        }}
       />
     </>
   );
