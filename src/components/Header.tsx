@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Globe, Search, Menu, X, Clock, Radio, Zap, Users, Tv, User, LogOut, MessageSquare, Crown } from 'lucide-react';
+import { Globe, Search, Menu, X, Clock, Radio, Zap, Users, Tv, User, LogOut, MessageSquare, Crown, Star } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useNews } from '../context/NewsContext';
 import { useAuth } from '../context/AuthContext';
 import LoginModal from './LoginModal';
+import MyNewsModal from './MyNewsModal';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showMyNewsModal, setShowMyNewsModal] = useState(false);
+  const [hasMyNewsPreferences, setHasMyNewsPreferences] = useState(false);
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
   const { currentLanguage, setLanguage, languages, translations } = useLanguage();
   const { lastUpdated, articles, refreshNews, personalizedArticles } = useNews();
   const { user, isAuthenticated, logout } = useAuth();
@@ -57,6 +61,37 @@ const Header = () => {
   const handleLogout = () => {
     logout();
     setShowUserMenu(false);
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const saved = localStorage.getItem(`myNewsCategories_${user.id}`);
+      const hasSeenModal = localStorage.getItem(`myNewsModalSeen_${user.id}`);
+
+      if (saved) {
+        setHasMyNewsPreferences(true);
+      } else {
+        setHasMyNewsPreferences(false);
+        if (!hasSeenModal) {
+          setIsFirstTimeUser(true);
+          setTimeout(() => {
+            setShowMyNewsModal(true);
+          }, 1000);
+        }
+      }
+    } else {
+      setHasMyNewsPreferences(false);
+    }
+  }, [user, isAuthenticated]);
+
+  const handleMyNewsSave = (categories: string[]) => {
+    if (user) {
+      localStorage.setItem(`myNewsCategories_${user.id}`, JSON.stringify(categories));
+      localStorage.setItem(`myNewsModalSeen_${user.id}`, 'true');
+      setHasMyNewsPreferences(true);
+      setIsFirstTimeUser(false);
+      navigate('/my-news');
+    }
   };
 
   return (
@@ -161,7 +196,35 @@ const Header = () => {
               </Link>
 
               <nav className="hidden lg:flex space-x-2">
-                {categories.map(category => (
+                {categories.slice(0, 1).map(category => (
+                  <Link
+                    key={category.key}
+                    to={category.path}
+                    className={`bbc-nav-item px-5 py-2 text-sm font-medium transition-all duration-200 ${
+                      isActivePath(category.path)
+                        ? 'active'
+                        : ''
+                    }`}
+                  >
+                    {translations[category.key] || category.name}
+                  </Link>
+                ))}
+
+                {hasMyNewsPreferences && isAuthenticated && (
+                  <Link
+                    to="/my-news"
+                    className={`bbc-nav-item px-5 py-2 text-sm font-medium transition-all duration-200 flex items-center space-x-1 ${
+                      location.pathname === '/my-news'
+                        ? 'active'
+                        : ''
+                    }`}
+                  >
+                    <Star className="w-4 h-4" />
+                    <span>My News</span>
+                  </Link>
+                )}
+
+                {categories.slice(1).map(category => (
                   <Link
                     key={category.key}
                     to={category.path}
@@ -281,7 +344,37 @@ const Header = () => {
               
               {/* Mobile Navigation */}
               <nav className="space-y-1">
-                {categories.map(category => (
+                {categories.slice(0, 1).map(category => (
+                  <Link
+                    key={category.key}
+                    to={category.path}
+                    className={`bbc-nav-item block px-3 py-2 text-base font-medium transition-colors mb-2 ${
+                      isActivePath(category.path)
+                        ? 'active'
+                        : ''
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {translations[category.key] || category.name}
+                  </Link>
+                ))}
+
+                {hasMyNewsPreferences && isAuthenticated && (
+                  <Link
+                    to="/my-news"
+                    className={`bbc-nav-item block px-3 py-2 text-base font-medium transition-colors mb-2 flex items-center space-x-2 ${
+                      location.pathname === '/my-news'
+                        ? 'active'
+                        : ''
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Star className="w-4 h-4" />
+                    <span>My News</span>
+                  </Link>
+                )}
+
+                {categories.slice(1).map(category => (
                   <Link
                     key={category.key}
                     to={category.path}
@@ -303,6 +396,18 @@ const Header = () => {
       </header>
 
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <MyNewsModal
+        isOpen={showMyNewsModal}
+        onClose={() => {
+          setShowMyNewsModal(false);
+          if (isFirstTimeUser && user) {
+            localStorage.setItem(`myNewsModalSeen_${user.id}`, 'true');
+          }
+        }}
+        onSave={handleMyNewsSave}
+        initialCategories={[]}
+        isFirstTime={isFirstTimeUser}
+      />
     </>
   );
 };
