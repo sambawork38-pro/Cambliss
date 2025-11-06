@@ -42,6 +42,18 @@ const HomePage: React.FC<HomePageProps> = ({ onArticleClick }) => {
   
   // Get cultural context for current language
   const culturalContext = getCulturalContext(currentLanguage);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+
+React.useEffect(() => {
+  if (breakingNews.length === 0) return;
+
+  const interval = setInterval(() => {
+    setCurrentIndex((prev) => (prev + 1) % breakingNews.length);
+  }, 4000); // auto-slide every 4 seconds
+
+  return () => clearInterval(interval);
+}, [breakingNews]);
+
 
   return (
     <div className={`max-w-7xl mx-auto px-4 py-6 space-y-8 min-h-screen bg-white script-${culturalContext.script.toLowerCase()}`} dir={culturalContext.direction}>
@@ -52,7 +64,17 @@ const HomePage: React.FC<HomePageProps> = ({ onArticleClick }) => {
           <div className="breaking-news-bg"></div>
           
           {/* Header Section */}
-          <div className="breaking-news-header">
+          {/* Header Section */}
+<div
+  className="breaking-news-header"
+  style={{
+    borderBottom: 'none',
+    boxShadow: 'none',
+    marginBottom: '0',
+    paddingBottom: '0',
+  }}
+>
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="breaking-badge">
@@ -71,66 +93,86 @@ const HomePage: React.FC<HomePageProps> = ({ onArticleClick }) => {
             </div>
           </div>
 
-          {/* Main Breaking Story */}
-          {breakingNews[0] && (
-            <div className="breaking-main-story">
-              <button
-                onClick={() => onArticleClick(breakingNews[0])}
-                className="breaking-main-card group"
-              >
-                <div className="flex items-start space-x-6">
-                  <img 
-                    src={breakingNews[0].imageUrl} 
-                    alt={breakingNews[0].title}
-                    className="breaking-main-image"
-                  />
-                  <div className="flex-1">
-                    <h2 className="breaking-main-title group-hover:text-red-100 transition-colors">
-                      {breakingNews[0].title}
-                    </h2>
-                    <p className="breaking-main-summary">
-                      {breakingNews[0].summary.substring(0, 150)}...
-                    </p>
-                    <div className="breaking-main-meta">
-                      <span className="flex items-center">
-                        <Clock className="w-4 h-4 mr-2" />
-                        {new Date(breakingNews[0].publishedAt).toLocaleTimeString()}
-                      </span>
-                      <span className="breaking-source">{breakingNews[0].source}</span>
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
-          )}
+{/* 🔥 Breaking News Carousel — Final Version with Click Navigation */}
+{breakingNews.length > 0 && (
+  <div className="relative w-full overflow-hidden rounded-lg shadow-md bg-white mt-2">
+    <div
+      className="flex transition-transform duration-700 ease-in-out"
+      style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+    >
+      {breakingNews.map((article) => (
+        // ✅ Click handler moved comment outside
+        <div
+          key={article.id}
+          className="min-w-full flex-shrink-0 flex flex-col bg-white cursor-pointer"
+          onClick={() => onArticleClick(article)}
+        >
+          {/* 🖼️ Taller Image */}
+          <div className="w-full h-80 md:h-96 overflow-hidden">
+            <img
+              src={article.imageUrl}
+              alt={article.title}
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
 
-          {/* Secondary Breaking Stories */}
-          <div className="breaking-secondary-stories">
-            <div className="breaking-stories-grid">
-              {breakingNews.slice(1, 4).map((article, index) => (
-                <button
-                  key={article.id}
-                  onClick={() => onArticleClick(article)}
-                  className="breaking-secondary-card group"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="breaking-card-content">
-                    <div className="breaking-card-number">{index + 2}</div>
-                    <div className="flex-1">
-                      <h3 className="breaking-secondary-title group-hover:text-red-100 transition-colors">
-                        {article.title}
-                      </h3>
-                      <div className="breaking-secondary-meta">
-                        <span>{new Date(article.publishedAt).toLocaleTimeString()}</span>
-                        <span className="breaking-dot">•</span>
-                        <span>{article.source}</span>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              ))}
+          {/* 📰 Compact Text Section */}
+          <div className="flex flex-col justify-between p-4 md:p-5">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-1 leading-snug hover:text-red-600 transition-colors">
+              {article.title}
+            </h2>
+            <p className="text-sm text-gray-700 mb-2 leading-relaxed">
+              {article.summary?.substring(0, 140)}...
+            </p>
+            <div className="flex items-center justify-between text-xs text-gray-500 mt-auto pt-1">
+              <span className="flex items-center">
+                <Clock className="w-4 h-4 mr-2" />
+                {new Date(article.publishedAt).toLocaleTimeString()}
+              </span>
+              <span className="font-medium">{article.source}</span>
             </div>
           </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Dots */}
+    <div className="absolute bottom-3 left-0 right-0 flex justify-center space-x-2">
+      {breakingNews.map((_, i) => (
+        <div
+          key={i}
+          onClick={() => setCurrentIndex(i)}
+          className={`h-2 w-2 rounded-full cursor-pointer transition-all duration-300 ${
+            i === currentIndex ? 'bg-red-600 w-4' : 'bg-gray-300'
+          }`}
+        ></div>
+      ))}
+    </div>
+
+    {/* Arrows */}
+    <button
+      onClick={() =>
+        setCurrentIndex((prev) =>
+          prev === 0 ? breakingNews.length - 1 : prev - 1
+        )
+      }
+      className="absolute top-1/2 left-3 transform -translate-y-1/2 bg-white/70 hover:bg-white/90 text-black p-2 rounded-full shadow-sm backdrop-blur-sm"
+    >
+      ‹
+    </button>
+
+    <button
+      onClick={() => setCurrentIndex((prev) => (prev + 1) % breakingNews.length)}
+      className="absolute top-1/2 right-3 transform -translate-y-1/2 bg-white/70 hover:bg-white/90 text-black p-2 rounded-full shadow-sm backdrop-blur-sm"
+    >
+      ›
+    </button>
+  </div>
+)}
+
+
+
+
 
           {/* Breaking News Ticker */}
           <div className="breaking-ticker">
