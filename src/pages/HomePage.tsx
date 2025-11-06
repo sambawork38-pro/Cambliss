@@ -62,7 +62,7 @@ const HomePage: React.FC<HomePageProps> = ({ onArticleClick }) => {
                 </div>
                 <div className="live-indicator">
                   <div className="live-dot"></div>
-                  <span>LIVE</span>
+                  <span>LIVER</span>
                 </div>
               </div>
               <div className="breaking-time">
