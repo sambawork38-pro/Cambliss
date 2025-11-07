@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Globe, Search, Menu, X, Clock, Radio, Zap, Users, Tv, User, LogOut, MessageSquare, Crown, Star } from 'lucide-react';
+import { Globe, Search, Menu, X, Clock, Radio, Zap, Users, Tv, User, LogOut, MessageSquare, Crown, Star, Plus } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useNews } from '../context/NewsContext';
 import { useAuth } from '../context/AuthContext';
 import LoginModal from './LoginModal';
 import MyNewsModal from './MyNewsModal';
+import AddNewsModal from './AddNewsModal';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,6 +14,7 @@ const Header = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMyNewsModal, setShowMyNewsModal] = useState(false);
+  const [showAddNewsModal, setShowAddNewsModal] = useState(false);
   const [hasMyNewsPreferences, setHasMyNewsPreferences] = useState(false);
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
   const { currentLanguage, setLanguage, languages, translations } = useLanguage();
@@ -254,6 +256,26 @@ const Header = () => {
                 </div>
               </form>
 
+              {/* Add News & User Posts Buttons */}
+              {isAuthenticated && user && (
+                <div className="flex items-center gap-2 hidden sm:flex">
+                  <button
+                    onClick={() => setShowAddNewsModal(true)}
+                    className="flex items-center gap-1 bg-gradient-to-r from-blue-600 to-indigo-500 text-white px-3 py-2 rounded-lg hover:from-blue-700 hover:to-indigo-600 transition font-medium text-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add News
+                  </button>
+                  <Link
+                    to="/user-posts"
+                    className="flex items-center gap-1 border border-indigo-500 text-indigo-600 px-3 py-2 rounded-lg hover:bg-indigo-50 transition font-medium text-sm"
+                  >
+                    <Users className="w-4 h-4" />
+                    Posts
+                  </Link>
+                </div>
+              )}
+
               {/* User Menu */}
               {isAuthenticated && user ? (
                 <div className="relative">
@@ -407,6 +429,10 @@ const Header = () => {
         onSave={handleMyNewsSave}
         initialCategories={[]}
         isFirstTime={isFirstTimeUser}
+      />
+      <AddNewsModal
+        isOpen={showAddNewsModal}
+        onClose={() => setShowAddNewsModal(false)}
       />
     </>
   );

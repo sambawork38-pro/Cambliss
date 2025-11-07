@@ -19,6 +19,8 @@ interface Article {
   localizedContent?: Record<string, { title: string; summary: string; content: string }>;
   culturalContext?: string;
   regionalRelevance?: string[];
+  videoUrl?: string;
+  isUserGenerated?: boolean;
 }
 
 interface NewsContextType {
@@ -32,6 +34,8 @@ interface NewsContextType {
   translateArticle: (article: Article, targetLanguage: string) => Article;
   personalizedArticles: Article[];
   refreshPersonalizedNews: () => void;
+  addNewsArticle: (article: Omit<Article, 'id' | 'readTime' | 'isPremium' | 'language'>) => void;
+  getUserArticles: (author: string) => Article[];
 }
 
 const NewsContext = createContext<NewsContextType | undefined>(undefined);
@@ -42,6 +46,18 @@ export const NewsProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [personalizedArticles, setPersonalizedArticles] = useState<Article[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('user_articles');
+    if (stored) {
+      try {
+        const userArticles = JSON.parse(stored);
+        setArticles(prev => [...userArticles, ...prev]);
+      } catch (e) {
+        console.error('Error loading user articles from localStorage:', e);
+      }
+    }
+  }, []);
 
   const categories = ['breaking', 'politics', 'india', 'world', 'business', 'technology', 'sports', 'entertainment', 'health'];
   const supportedLanguages = ['en', 'hi', 'or', 'bn', 'ta', 'te', 'gu', 'mr', 'kn', 'pa'];
@@ -184,6 +200,27 @@ export const NewsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  const addNewsArticle = (articleData: Omit<Article, 'id' | 'readTime' | 'isPremium' | 'language'>) => {
+    const newArticle: Article = {
+      ...articleData,
+      id: `user_${Date.now()}_${Math.random()}`,
+      readTime: Math.ceil(articleData.content.split(' ').length / 200),
+      isPremium: false,
+      language: 'en',
+      isUserGenerated: true
+    };
+
+    const updated = [newArticle, ...articles];
+    setArticles(updated);
+
+    const userArticles = updated.filter(a => a.isUserGenerated);
+    localStorage.setItem('user_articles', JSON.stringify(userArticles));
+  };
+
+  const getUserArticles = (author: string): Article[] => {
+    return articles.filter(article => article.author === author && article.isUserGenerated);
+  };
+
   const value = {
     articles,
     personalizedArticles,
@@ -194,7 +231,9 @@ export const NewsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     getArticlesByCategory,
     searchArticles,
     getLocalizedArticles,
-    translateArticle
+    translateArticle,
+    addNewsArticle,
+    getUserArticles
   };
 
   return <NewsContext.Provider value={value}>{children}</NewsContext.Provider>;

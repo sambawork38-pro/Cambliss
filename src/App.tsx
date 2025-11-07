@@ -11,6 +11,7 @@ import UserDashboard from './components/UserDashboard';
 import FullArticle from './components/FullArticle';
 import Chatbot from './components/Chatbot';
 import VoiceReader from './components/VoiceReader';
+import UserPosts from './pages/UserPosts';
 import { NewsProvider } from './context/NewsContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
@@ -40,6 +41,7 @@ function App() {
                     setSelectedArticle(article);
                     setShowFullArticle(true);
                   }} />} />
+                  <Route path="/user-posts" element={<UserPosts />} />
                   <Route path="/social" element={<SocialPage />} />
                   <Route path="/dashboard" element={<UserDashboard />} />
                   <Route path="/category/:categoryName" element={<CategoryPage onArticleClick={(article) => {
