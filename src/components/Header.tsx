@@ -369,18 +369,19 @@ const Header = () => {
               
               {/* Mobile Navigation */}
               <nav className="space-y-1">
-                {categories.slice(0, 1).map(category => (
+                {categories.slice(0, 2).map(category => (
                   <Link
                     key={category.key}
                     to={category.path}
-                    className={`bbc-nav-item block px-3 py-2 text-base font-medium transition-colors mb-2 ${
+                    className={`bbc-nav-item block px-3 py-2 text-base font-medium transition-colors mb-2 flex items-center space-x-2 ${
                       isActivePath(category.path)
                         ? 'active'
                         : ''
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {translations[category.key] || category.name}
+                    {category.icon && <category.icon className="w-4 h-4" />}
+                    <span>{translations[category.key] || category.name}</span>
                   </Link>
                 ))}
 
@@ -399,7 +400,7 @@ const Header = () => {
                   </Link>
                 )}
 
-                {categories.slice(1).map(category => (
+                {categories.slice(2).map(category => (
                   <Link
                     key={category.key}
                     to={category.path}
