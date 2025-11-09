@@ -25,6 +25,7 @@ const Header = () => {
 
   const categories = [
     { name: 'Home', path: '/', key: 'home' },
+    { name: 'Cambliss Social', path: '/social', key: 'social', icon: MessageSquare },
     { name: 'India', path: '/category/india', key: 'india' },
     { name: 'World', path: '/category/world', key: 'world' },
     { name: 'Business', path: '/category/business', key: 'business' },
