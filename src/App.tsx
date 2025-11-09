@@ -16,6 +16,7 @@ import { NewsProvider } from './context/NewsContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
 import { SubscriptionProvider } from './context/SubscriptionContext';
+import { SocialFeedProvider } from './context/SocialFeedContext';
 import SubscriptionPage from './pages/SubscriptionPage';
 import SubscriptionSuccess from './pages/SubscriptionSuccess';
 
@@ -27,8 +28,9 @@ function App() {
     <AuthProvider>
       <SubscriptionProvider>
         <NewsProvider>
-          <LanguageProvider>
-            <Router>
+          <SocialFeedProvider>
+            <LanguageProvider>
+              <Router>
             <div className="min-h-screen bg-gray-50">
               <Header />
               <main className="pt-20">
