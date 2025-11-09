@@ -134,10 +134,10 @@ const SocialPage: React.FC = () => {
                   Trending Topics
                 </h3>
                 <div className="space-y-3">
-                  {['#BreakingNews', '#ClimateChange', '#Elections2025', '#TechNews', '#GlobalHealth'].map(tag => (
-                    <div key={tag} className="flex items-center justify-between">
-                      <span className="text-red-600 font-medium">{tag}</span>
-                      <span className="text-gray-500 text-sm">{Math.floor(Math.random() * 1000)}K</span>
+                  {getTrendingHashtags().slice(0, 5).map(hashtag => (
+                    <div key={hashtag.tag} className="flex items-center justify-between hover:bg-gray-50 p-2 rounded cursor-pointer transition-colors">
+                      <span className="text-red-600 font-medium">#{hashtag.tag}</span>
+                      <span className="text-gray-500 text-sm">{hashtag.count} posts</span>
                     </div>
                   ))}
                 </div>
