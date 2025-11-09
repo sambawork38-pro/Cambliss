@@ -3,10 +3,12 @@ import { MessageSquare, Users, TrendingUp, Shield, Globe, Award } from 'lucide-r
 import SocialFeed from '../components/SocialFeed';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useSocialFeed } from '../context/SocialFeedContext';
 
 const SocialPage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const { currentLanguage } = useLanguage();
+  const { getTrendingHashtags } = useSocialFeed();
 
   return (
     <div className="min-h-screen bg-gray-50">
