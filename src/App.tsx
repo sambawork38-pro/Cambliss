@@ -72,7 +72,8 @@ function App() {
               <Chatbot />
             </div>
             </Router>
-          </LanguageProvider>
+            </LanguageProvider>
+          </SocialFeedProvider>
         </NewsProvider>
       </SubscriptionProvider>
     </AuthProvider>
