@@ -364,25 +364,29 @@ const SocialFeed: React.FC = () => {
       )}
 
       {/* Posts Feed */}
-      <div className="space-y-6" data-testid="posts-feed">
-        {filteredPosts.length > 0 ? (
-          filteredPosts.map((post) => (
-            <SocialPostCard key={post.id} post={post} />
-          ))
-        ) : (
-          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-12 text-center">
-            <div className="text-gray-400 mb-4">
-              <Filter className="w-16 h-16 mx-auto" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No posts found</h3>
-            <p className="text-gray-600">
-              {activeFilter === 'following' && 'Follow users to see their posts here.'}
-              {activeFilter === 'my-posts' && 'You haven\'t created any posts yet.'}
-              {activeFilter !== 'following' && activeFilter !== 'my-posts' && 'No posts available in this category.'}
-            </p>
-          </div>
-        )}
+      {/* Posts Feed - Centered Modern Social Layout */}
+<div className="flex justify-center">
+  <div className="w-full max-w-2xl space-y-6" data-testid="posts-feed">
+    {filteredPosts.length > 0 ? (
+      filteredPosts.map((post) => (
+        <SocialPostCard key={post.id} post={post} />
+      ))
+    ) : (
+      <div className="bg-white rounded-xl shadow-md border border-gray-200 p-12 text-center">
+        <div className="text-gray-400 mb-4">
+          <Filter className="w-16 h-16 mx-auto" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">No posts found</h3>
+        <p className="text-gray-600">
+          {activeFilter === 'following' && 'Follow users to see their posts here.'}
+          {activeFilter === 'my-posts' && "You haven't created any posts yet."}
+          {activeFilter !== 'following' && activeFilter !== 'my-posts' && 'No posts available in this category.'}
+        </p>
       </div>
+    )}
+  </div>
+</div>
+
     </div>
   );
 };
